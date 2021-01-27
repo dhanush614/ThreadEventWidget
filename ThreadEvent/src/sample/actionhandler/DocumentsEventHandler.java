@@ -77,7 +77,7 @@ public class DocumentsEventHandler implements EventActionHandler {
 				HashMap<Integer, HashMap<String, Object>> responseData = new HashMap<Integer, HashMap<String, Object>>();
 				XSSFWorkbook workbook = new XSSFWorkbook(stream);
 				excelRows = readExcelRows(os, workbook);
-				responseData = threadExecMethod(excelRows, docTitle, os);
+				responseData = threadExecMethod(excelRows, docTitle);
 				updateDocument(responseData, os, doc, workbook, stream);
 			}
 		} catch (Exception e) {
@@ -90,7 +90,7 @@ public class DocumentsEventHandler implements EventActionHandler {
 	}
 
 	public static HashMap<Integer, HashMap<String, Object>> threadExecMethod(
-			HashMap<Integer, HashMap<String, Object>> excelRows, String docTitle, ObjectStore targetOS) {
+			HashMap<Integer, HashMap<String, Object>> excelRows, String docTitle) {
 		HashMap<Integer, HashMap<String, Object>> responseMap = new HashMap<Integer, HashMap<String, Object>>();
 		ExecutorService threadExecutor = Executors.newFixedThreadPool(10);
 		List<Future<HashMap<Integer, HashMap<String, Object>>>> responseList = new ArrayList<Future<HashMap<Integer, HashMap<String, Object>>>>();
@@ -99,7 +99,7 @@ public class DocumentsEventHandler implements EventActionHandler {
 			try {
 				Entry<Integer, HashMap<String, Object>> propertyPair = excelRow.next();
 				Future<HashMap<Integer, HashMap<String, Object>>> threadList = threadExecutor
-						.submit(new ThreadClass(propertyPair.getKey(), propertyPair.getValue(), docTitle, targetOS));
+						.submit(new ThreadClass(propertyPair.getKey(), propertyPair.getValue(), docTitle));
 				responseList.add(threadList);
 			} catch (Exception e) {
 				e.printStackTrace();

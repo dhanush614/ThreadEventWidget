@@ -5,8 +5,13 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 
+import com.filenet.api.constants.ClassNames;
 import com.filenet.api.constants.RefreshMode;
+import com.filenet.api.core.Connection;
+import com.filenet.api.core.Domain;
+import com.filenet.api.core.Factory;
 import com.filenet.api.core.ObjectStore;
+import com.filenet.api.events.ObjectChangeEvent;
 import com.ibm.casemgmt.api.Case;
 import com.ibm.casemgmt.api.CaseType;
 import com.ibm.casemgmt.api.constants.ModificationIntent;
@@ -19,22 +24,23 @@ public class ThreadClass implements Callable<HashMap<Integer, HashMap<String, Ob
 	HashMap<String, Object> caseProperties;
 	int rowNumber;
 	String casetypeName;
-	ObjectStore targetOS;
 
-	public ThreadClass(int rowNumber, HashMap<String, Object> hashMap, String casetypeName, ObjectStore targetOS) {
+	public ThreadClass(int rowNumber, HashMap<String, Object> hashMap, String casetypeName) {
 		super();
 		this.rowNumber = rowNumber;
 		this.caseProperties = hashMap;
 		this.casetypeName = casetypeName;
-		this.targetOS = targetOS;
 	}
 
 	@Override
 	public HashMap<Integer, HashMap<String, Object>> call() throws Exception {
 		// TODO Auto-generated method stub
 		CaseMgmtContext oldCmc = null;
+		ConnectionClass connectionClass = new ConnectionClass();
+		Connection conn = connectionClass.getConnection();
+		Domain domain = Factory.Domain.fetchInstance(conn, null, null);
 		HashMap<Integer, HashMap<String, Object>> responseMap = new HashMap<Integer, HashMap<String, Object>>();
-
+		ObjectStore targetOS = (ObjectStore) domain.fetchObject(ClassNames.OBJECT_STORE, "tos", null);
 		SimpleVWSessionCache vwSessCache = new SimpleVWSessionCache();
 		CaseMgmtContext cmc = new CaseMgmtContext(vwSessCache, new SimpleP8ConnectionCache());
 		oldCmc = CaseMgmtContext.set(cmc);
